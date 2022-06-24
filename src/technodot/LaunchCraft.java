@@ -1,19 +1,44 @@
-import javax.swing.*;
+package src.technodot;
+
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
 import java.io.*;
-import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.text.*;
+import javax.imageio.*;
 
-class LaunchCraft {
+public class LaunchCraft {
   public static void main(String[] args) {
     // init
-    System.out.println("Hello World!");
+    System.out.println("Hello World!\nInitializing");
     JFrame frame = new JFrame("LaunchCraft");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setIconImage(ImageIO.read(new File("assets/icon64.png")));
+    try {
+      frame.setIconImage(ImageIO.read(new File("src/technodot/assets/icon64.png")));
+    } catch(IOException e) {
+      System.out.println("Warning: asset not found: icon64.png");
+      e.printStackTrace();
+    }
     frame.setSize(500, 300);
-
+    
+    try {
+      BufferedImage dirt = ImageIO.read(new File("src/technodot/assets/dirt.png"));
+      TiledImage dirt_bg = new TiledImage(dirt);
+      frame.setContentPane(dirt_bg);
+    } catch(IOException e) {
+      System.out.println("Warning: asset not found: dirt.png");
+    }
+    
     // components
+    
+    // north
+    JPanel title = new JPanel();
+    title.setBackground(Color.black);
+    JLabel text = new JLabel("LaunchCraft v0.0a");
+    text.setForeground(Color.white);
+    ImageIcon icon = new ImageIcon("src/assets/icon64.png");
+    JLabel logo = new JLabel(icon);
     
     // west
     JPanel menu = new JPanel(new GridLayout(5, 1));
@@ -47,7 +72,7 @@ class LaunchCraft {
     version.addActionListener(new ActionListener () {
       public void actionPerformed(ActionEvent e) {
         String vers = version.getSelectedItem().toString();
-        if (vers == "Manage Accounts") {
+        if (vers == "Manage Installations") {
           button.setEnabled(false);
           // open version tab
         } else {
@@ -69,20 +94,51 @@ class LaunchCraft {
     });
 
     // show
+    title.add(text);
+    title.add(logo);
+    title.setOpaque(false);
+    frame.add(BorderLayout.NORTH, title);
+    
     menu.add(account_b);
     menu.add(version_b);
     menu.add(hack_b);
     menu.add(web_b);
     menu.add(setting_b);
+    menu.setOpaque(false);
     frame.add(BorderLayout.EAST, menu);
     
     play.add(user);
     play.add(version);
     play.add(button);
+    play.setOpaque(false);
     frame.add(BorderLayout.SOUTH, play);
 
     // run
     frame.setVisible(true);
     System.out.println("Done");
   }
+}
+
+// https://stackoverflow.com/questions/24746354/java-jpanel-tiled-background-image
+public class TiledImage extends JPanel {
+  BufferedImage tile;
+  public TiledImage(BufferedImage image) {
+    tile = image;
+  }
+  protected void paintComponent(Graphics g) {
+    int w = getWidth();
+    int h = getHeight();
+    int tw = tile.getWidth();
+    int th = tile.getHeight();
+    for (int x=0;x<w;x+=tw) {
+      for (int y=0;y<h;y+=th) {
+        g.drawImage(tile, x, y, this);
+      }
+    }
+  }
+  /*
+  public static void main(String[] args) {
+    // do nothing
+  }
+  */
 }
